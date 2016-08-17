@@ -1,0 +1,64 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+#    parameter_name: value
+
+services:
+    app.guzzle:
+        class: GuzzleHttp\Client
+        arguments: ~
+
+    # Services
+
+    app.service.slack_client:
+        class: AppBundle\Service\SlackClient
+        arguments:
+          - "@app.guzzle"
+          - "https://api.slack.com/api"
+
+    app.service.auth:
+        class: AppBundle\Service\AuthService
+        arguments: [ "@app.service.slack_client", "@app.document.repository.auth", "@app.service.team" ]
+
+    app.service.channel:
+        class: AppBundle\Service\ChannelService
+        arguments: [ "@app.service.slack_client", "@app.document.repository.channel", "@app.service.message" ]
+
+    app.service.message:
+        class: AppBundle\Service\MessageService
+        arguments: [ "@app.service.slack_client", "@app.document.repository.message", "@app.service.user"  ]
+
+    app.service.user:
+        class: AppBundle\Service\UserService
+        arguments: [ "@app.service.slack_client", "@app.document.repository.user" ]
+
+    app.service.team:
+        class: AppBundle\Service\TeamService
+        arguments: [ "@app.service.slack_client", "@app.document.repository.team" ]
+
+    # Document Repositories
+
+    app.document.repository.auth:
+        class: AppBundle\Document\Repository\AuthRepository
+        factory: [ "@doctrine_mongodb.odm.document_manager" , getRepository]
+        arguments: [ "AppBundle:Auth" ]
+
+    app.document.repository.channel:
+        class: AppBundle\Document\Repository\ChannelRepository
+        factory: [ "@doctrine_mongodb.odm.document_manager" , getRepository]
+        arguments: [ "AppBundle:Channel" ]
+
+    app.document.repository.message:
+        class: AppBundle\Document\Repository\MessageRepository
+        factory: [ "@doctrine_mongodb.odm.document_manager" , getRepository]
+        arguments: [ "AppBundle:Message" ]
+
+    app.document.repository.team:
+        class: AppBundle\Document\Repository\TeamRepository
+        factory: [ "@doctrine_mongodb.odm.document_manager" , getRepository]
+        arguments: [ "AppBundle:Team" ]
+
+    app.document.repository.user:
+        class: AppBundle\Document\Repository\UserRepository
+        factory: [ "@doctrine_mongodb.odm.document_manager" , getRepository]
+        arguments: [ "AppBundle:User" ]
