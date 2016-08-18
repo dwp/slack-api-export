@@ -58,6 +58,7 @@ class MessageService
         if (is_null($message)) {
             // none found so create
             $message = new Message($channel, $data);
+            // populate key users.
             if (array_key_exists('user', $data)) {
                 $message->setUser($this->users->get($data['user']));
             }
@@ -68,6 +69,21 @@ class MessageService
         } else {
             $message->updateFromApiData($data);
         }
+        // if we have reactions, also ensure user data is present
+        $this->updateReactions($data, $message);
         return $message;
+    }
+
+    private function updateReactions($data, Message $message)
+    {
+        // if no reactions then do nothing
+        if (!array_key_exists('reactions', $data)) return;
+        // otherwise process and update the message
+        foreach ($data['reactions'] AS $reactionData) {
+            $reaction = $message->getReactionByName($reactionData['name']);
+            foreach ($reactionData['users'] AS $userId) {
+                $reaction->addUser($this->users->get($userId));
+            }
+        }
     }
 }

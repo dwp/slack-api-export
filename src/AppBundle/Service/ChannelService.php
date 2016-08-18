@@ -95,6 +95,8 @@ class ChannelService
      * Method to sync historical messages for a channel
      *
      * @param Channel $channel
+     * @param mixed $latest
+     * @param mixed $oldest
      */
     public function syncHistory(Channel $channel, $latest = null, $oldest = 0)
     {
@@ -109,6 +111,21 @@ class ChannelService
                 ]
             ]
         );
+
+        // store timestamp of the first message, if it is earlier than the current value
+        if (count(array_values($messages['messages'])) > 0) {
+            $lastMessageDateTime = new \DateTime("@" . intval(array_values($messages['messages'])[0]['ts']));
+            if (
+                (
+                    $channel->getLastMessage() instanceof \DateTime &&
+                    $channel->getLastMessage() > $lastMessageDateTime
+                ) ||
+                is_null($channel->getLastMessage())
+            ) {
+                $channel->setLastMessage($lastMessageDateTime);
+            }
+        }
+
         // try and find the message based on timestamp and user
         foreach ($messages['messages'] AS $messageData) {
             $message = $this->messages->updateFromApi($channel, $messageData);
@@ -117,7 +134,7 @@ class ChannelService
 
         // if we have more then make a recursive query
         if (true === (bool) $messages['has_more']) {
-           $this->syncHistory($channel, $message->getTimestamp());
+           $this->syncHistory($channel, $message->getTimestamp(), $oldest);
         }
     }
 }

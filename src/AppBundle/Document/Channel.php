@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use DateTime;
 
 /**
  * Representation of a Slack channel.
@@ -78,6 +79,11 @@ class Channel
      * @var DateTime
      */
     protected $createdAt;
+    /**
+     * @ODM\Field(type="date", name="last_message")
+     * @var DateTime
+     */
+    protected $lastMessage;
 
     /**
      * Channel constructor.
@@ -303,9 +309,25 @@ class Channel
     /**
      * @param DateTime $createdAt
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt(DateTime $createdAt = null)
     {
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getLastMessage()
+    {
+        return $this->lastMessage;
+    }
+
+    /**
+     * @param mixed $lastMessage
+     */
+    public function setLastMessage(DateTime $lastMessage = null)
+    {
+        $this->lastMessage = $lastMessage;
     }
 
 }

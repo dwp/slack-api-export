@@ -29,6 +29,16 @@ class Message
      */
     protected $channel;
     /**
+     * @ODM\ReferenceOne(targetDocument="User")
+     * @var User;
+     */
+    protected $user;
+    /**
+     * @ODM\EmbedMany(targetDocument="Reaction")
+     * @var ArrayCollection[Reaction];
+     */
+    protected $reactions;
+    /**
      * @ODM\Field(type="string")
      * @var string
      */
@@ -38,11 +48,6 @@ class Message
      * @var string
      */
     protected $subType;
-    /**
-     * @ODM\ReferenceOne(targetDocument="User")
-     * @var User;
-     */
-    protected $user;
     /**
      * @ODM\ReferenceOne(targetDocument="User")
      * @var User;
@@ -68,11 +73,6 @@ class Message
      * @var boolean
      */
     protected $isBot = false;
-    /**
-     * @ODM\EmbedMany(targetDocument="Reaction")
-     * @var ArrayCollection[Reaction];
-     */
-    protected $reactions;
 
     /**
      * Message constructor.
@@ -102,9 +102,15 @@ class Message
 
         // now do embedded reactions
         if (array_key_exists('reactions', $data) && is_array($data['reactions'])) {
-            foreach ($data['reactions'] AS $reaction) {
-                $reaction = new Reaction($reaction);
-                $this->addReaction($reaction);
+            foreach ($data['reactions'] AS $reactionData) {
+                // do we have a dupe
+                $reaction = $this->getReactionByName($reactionData['name']);
+                if (is_null($reaction)) {
+                    $reaction = new Reaction($reactionData);
+                    $this->addReaction($reaction);
+                } else {
+                    $reaction->setCount($reactionData['count']);
+                }
             }
         }
     }
@@ -135,6 +141,23 @@ class Message
         if (!$this->reactions->contains($reaction)) {
             $this->reactions->add($reaction);
         }
+    }
+
+    /**
+     * Method to fetch a unique reaction.
+     *
+     * @param $name
+     * @return Reaction|null
+     */
+    public function getReactionByName($name)
+    {
+        /** @var Reaction $reaction */
+        foreach ($this->reactions AS $reaction) {
+            if ($reaction->getName() === $name) {
+                return $reaction;
+            }
+        }
+        return null;
     }
 
     /**

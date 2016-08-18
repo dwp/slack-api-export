@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Channel;
 use AppBundle\Document\Team;
 use AppBundle\Document\User;
 use AppBundle\Service\ChannelService;
@@ -28,6 +29,12 @@ class SlackSyncCommand extends ContainerAwareCommand
         $this
             ->setName('slack:sync')
             ->setDescription('Command to sync local data with remote slack installs - will sync all teams that are authenticated with the bot..')
+            ->addOption(
+                'update',
+                null,
+                InputOption::VALUE_NONE,
+                'If an update, rather than a full sync is to be performed'
+            );
         ;
     }
 
@@ -59,8 +66,17 @@ class SlackSyncCommand extends ContainerAwareCommand
             $channels = $this->getChannelService()->syncTeam($team);
             /** @var Channel $channel */
             foreach($channels AS $channel) {
-                $output->writeln(sprintf(">>> Syncing channel history - %s", $channel->getName()));
-                $this->getChannelService()->syncHistory($channel);
+                if ($input->getOption('update')) {
+                    $output->writeln(sprintf(">>> Updating channel history - %s", $channel->getName()));
+                    $oldestMessage = 0;
+                    if ($channel->getLastMessage() instanceof \DateTime) {
+                        $oldestMessage = (string) $channel->getLastMessage()->getTimestamp();
+                    }
+                    $this->getChannelService()->syncHistory($channel, null, $oldestMessage);
+                } else {
+                    $output->writeln(sprintf(">>> Syncing channel history - %s", $channel->getName()));
+                    $this->getChannelService()->syncHistory($channel);
+                }
             }
             unset($channels, $channel);
 

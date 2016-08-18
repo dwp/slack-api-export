@@ -15,11 +15,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Reaction
 {
     /**
-     *
-     * @var array
+     * @ODM\Field(type="string")
+     * @var string
      */
     protected $name;
+    /**
+     * @ODM\Field(type="integer")
+     * @var int
+     */
     protected $count;
+    /**
+     * @ODM\ReferenceMany(targetDocument="User")
+     * @var ArrayCollection;
+     */
     protected $users;
 
     /**
@@ -44,5 +52,37 @@ class Reaction
         if (!$this->users->contains($user)) {
             $this->users->add($user);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCount()
+    {
+        return $this->count;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCount($count)
+    {
+        $this->count = $count;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }
