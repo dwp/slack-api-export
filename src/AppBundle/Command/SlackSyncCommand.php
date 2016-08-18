@@ -27,9 +27,7 @@ class SlackSyncCommand extends ContainerAwareCommand
     {
         $this
             ->setName('slack:sync')
-            ->setDescription('Command to sync local data with remote slack installs.')
-            ->addArgument('argument', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option', null, InputOption::VALUE_NONE, 'Option description')
+            ->setDescription('Command to sync local data with remote slack installs - will sync all teams that are authenticated with the bot..')
         ;
     }
 
@@ -48,6 +46,7 @@ class SlackSyncCommand extends ContainerAwareCommand
         foreach ($teams AS $team) {
 
             $output->writeln(sprintf("> Syncing team: %s", $team->getName()));
+
             $output->writeln(">> Retrieving user data...");
             $users = $this->getUserService()->syncTeam($team);
             /** @var User $user */
@@ -55,6 +54,7 @@ class SlackSyncCommand extends ContainerAwareCommand
                 $output->writeln(sprintf(">>> Syncing user - %s", $user->getName()));
             }
             unset($users, $user);
+
             $output->writeln(">> Retrieving channel data...");
             $channels = $this->getChannelService()->syncTeam($team);
             /** @var Channel $channel */
@@ -62,6 +62,8 @@ class SlackSyncCommand extends ContainerAwareCommand
                 $output->writeln(sprintf(">>> Syncing channel history - %s", $channel->getName()));
                 $this->getChannelService()->syncHistory($channel);
             }
+            unset($channels, $channel);
+
         }
         $output->writeln(sprintf("> Syncronisation complete."));
     }

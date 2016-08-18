@@ -36,14 +36,7 @@ class OauthController extends Controller
                     'channels:history',
                     'channels:read',
                     'dnd:read',
-                    'groups:history',
-                    'groups:read',
-                    'im:history',
-                    'im:read',
-                    'mpim:history',
-                    'mpim:read',
                     'team:read',
-                    'usergroups:read',
                     'users.profile:read',
                     'users:read'
                 ]
