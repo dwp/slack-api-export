@@ -118,7 +118,7 @@ class ChannelService
             if (
                 (
                     $channel->getLastMessage() instanceof \DateTime &&
-                    $channel->getLastMessage() > $lastMessageDateTime
+                    $channel->getLastMessage() < $lastMessageDateTime
                 ) ||
                 is_null($channel->getLastMessage())
             ) {
