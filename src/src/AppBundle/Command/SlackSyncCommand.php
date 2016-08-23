@@ -28,7 +28,7 @@ class SlackSyncCommand extends ContainerAwareCommand
     {
         $this
             ->setName('slack:sync')
-            ->setDescription('Command to sync local data with remote slack installs - will sync all teams that are authenticated with the bot..')
+            ->setDescription('Command to sync local data with all Slack installs.')
             ->addOption(
                 'update',
                 null,

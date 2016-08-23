@@ -65,7 +65,7 @@ doctrine_mongodb:
         default:
             server: "%mongodb_server%"
             options: {}
-    default_database: slack_api_consumer
+    default_database: slack-api-export
     document_managers:
         default:
             auto_mapping: true

@@ -19,5 +19,5 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    # MongoDB
-    mongodb_server: "mongodb://localhost:27017"
+    # MongoDB server url
+    mongodb_server: ~

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -10,13 +11,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @package AppBundle
  * @ODM\Document(collection="team",repositoryClass="AppBundle\Document\Repository\TeamRepository")
  */
-class Team
+class Team implements \JsonSerializable
 {
     /**
      * @ODM\Id(strategy="NONE")
      * @var string
      */
     protected $id;
+
+    /**
+     * @ODM\ReferenceMany(targetDocument="User", mappedBy="team")
+     * @var User[]
+     */
+    protected $users;
+
+    /**
+     * @ODM\ReferenceMany(targetDocument="Channel", mappedBy="team")
+     * @var Channel[]
+     */
+    protected $channels;
 
     /**
      * @ODM\Field(type="string")
@@ -53,6 +66,8 @@ class Team
         $this->id = $data['id'];
         $this->updateFromApiData($data);
         $this->auth = $auth;
+        $this->users = new ArrayCollection();
+        $this->channels = new ArrayCollection();
     }
 
     /**
@@ -73,6 +88,22 @@ class Team
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return User[]
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    /**
+     * @return Channel[]
+     */
+    public function getChannels()
+    {
+        return $this->channels;
     }
 
     /**
@@ -139,4 +170,22 @@ class Team
         $this->auth = $auth;
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'domain' => $this->getDomain(),
+            'email_domain' => $this->getEmailDomain(),
+            'users' => $this->getUsers()->toArray(),
+            'channels' => $this->getChannels()->toArray()
+        ];
+    }
 }

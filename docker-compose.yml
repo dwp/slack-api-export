@@ -1,15 +1,28 @@
 version: '2'
 services:
-  superscript:
+
+  slack-api-export:
     build: .
+
+  http:
+    build:
+      context: .
+      dockerfile: Dockerfile.http
     environment:
       - SLACK_CLIENT_ID
       - SLACK_CLIENT_SECRET
       - SLACK_CLIENT_REDIRECT_URI
-      - SYMFONY_MONGODB_SERVER=mongodb://mongo:27017
-    depends_on:
-      - mongo
+      - SYMFONY__MONGODB_SERVER=mongodb://mongo:27017
+    volumes_from:
+      - slack-api-export
+
   mongo:
     image: mongo
     volumes:
-     - ./mongo:/data/db
+      - ./mongo:/data/db
+
+  tunnel:
+    image: chuangbo/localtunnel
+    links:
+      - slack-api-export
+    command: lt -l http -p 8000 -s ${TUNNEL_HOSTNAME}

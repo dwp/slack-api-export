@@ -12,7 +12,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @package AppBundle
  * @ODM\EmbeddedDocument()
  */
-class Reaction
+class Reaction implements \JsonSerializable
 {
     /**
      * @ODM\Field(type="string")
@@ -84,5 +84,20 @@ class Reaction
     public function getUsers()
     {
         return $this->users;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return [
+            'name' => $this->getName(),
+            'count' => $this->getCount()
+        ];
     }
 }

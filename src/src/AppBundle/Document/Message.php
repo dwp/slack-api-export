@@ -10,6 +10,7 @@ namespace AppBundle\Document;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Representation of a Slack message.
@@ -17,19 +18,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @package AppBundle
  * @ODM\Document(collection="message",repositoryClass="AppBundle\Document\Repository\MessageRepository")
  */
-class Message
+class Message implements \JsonSerializable
 {
     /**
      * @ODM\Id
      */
     protected $id;
     /**
-     * @ODM\ReferenceOne(targetDocument="User")
+     * @ODM\ReferenceOne(targetDocument="Channel")
      * @var Channel;
      */
     protected $channel;
     /**
-     * @ODM\ReferenceOne(targetDocument="User")
+     * @ODM\ReferenceOne(targetDocument="User", inversedBy="messages")
      * @var User;
      */
     protected $user;
@@ -265,6 +266,14 @@ class Message
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getTimestampDateTime()
+    {
+        return new \DateTime("@" . intval($this->getTimestamp()));
+    }
+
+    /**
      * @param float $timestamp
      */
     public function setTimestamp($timestamp)
@@ -289,7 +298,7 @@ class Message
     }
 
     /**
-     * @return ArrayCollection
+     * @return Reaction[]
      */
     public function getReactions()
     {
@@ -307,7 +316,7 @@ class Message
     /**
      * @return boolean
      */
-    public function isIsBot()
+    public function getIsBot()
     {
         return $this->isBot;
     }
@@ -320,4 +329,24 @@ class Message
         $this->isBot = $isBot;
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'timestamp' => $this->getTimestampDateTime()->format(\DateTime::ISO8601),
+            'type' => $this->getType(),
+            'sub_type' => $this->getSubType(),
+            'channel' => $this->getChannel()->getName(),
+            'text' => $this->getText(),
+            'reactions' => $this->getReactions()->toArray(),
+            'is_bot' => $this->getIsBot(),
+        ];
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -10,78 +11,98 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @package AppBundle
  * @ODM\Document(collection="user",repositoryClass="AppBundle\Document\Repository\UserRepository")
  */
-class User
+class User implements \JsonSerializable
 {
     /**
      * @ODM\Id(strategy="NONE")
      * @var string
      */
     protected $id;
+
     /**
-     * @ODM\ReferenceOne(targetDocument="Team")
+     * @ODM\ReferenceOne(targetDocument="Team", inversedBy="users")
      * @var Team
      */
     protected $team;
+
+    /**
+     * @ODM\ReferenceMany(targetDocument="Message", mappedBy="user")
+     * @var Message[]
+     */
+    protected $messages;
+
     /**
      * @ODM\Field(type="string")
      * @var string
      */
     protected $name;
+
     /**
      * @ODM\Field(type="boolean")
      * @var string
      */
     protected $deleted;
+
     /**
      * @ODM\Field(type="string")
      * @var string
      */
     protected $color;
+
     /**
      * @ODM\Field(type="string", name="first_name")
      * @var string
      */
     protected $firstName;
+
     /**
      * @ODM\Field(type="string", name="last_name")
      * @var string
      */
     protected $lastName;
+
     /**
      * @ODM\Field(type="string", name="real_name")
      * @var string
      */
     protected $realName;
+
     /**
      * @ODM\Field(type="string")
      * @var string
      */
     protected $email;
+
     /**
      * @ODM\Field(type="string")
      * @var string
      */
     protected $skype;
+
     /**
      * @ODM\Field(type="string")
      * @var string
      */
     protected $phone;
+
     /**
      * @ODM\Field(type="boolean", name="is_admin")
      * @var string
      */
     protected $isAdmin;
+
     /**
      * @ODM\Field(type="boolean", name="is_owner")
      * @var string
      */
     protected $isOwner;
+
     /**
      * @ODM\Field(type="boolean", name="has_2fa")
      * @var string
      */
     protected $has2fa;
+
     /**
      * @ODM\Field(type="boolean", name="is_bot")
      * @var string
@@ -97,6 +118,7 @@ class User
     {
         $this->id = $data['id'];
         $this->updateFromApiData($data);
+        $this->messages = new ArrayCollection();
     }
 
     /**
@@ -146,6 +168,30 @@ class User
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return Team
+     */
+    public function getTeam()
+    {
+        return $this->team;
+    }
+
+    /**
+     * @param Team $team
+     */
+    public function setTeam(Team $team)
+    {
+        $this->team = $team;
+    }
+
+    /**
+     * @return Message[]
+     */
+    public function getMessages()
+    {
+        return $this->messages;
     }
 
     /**
@@ -341,22 +387,6 @@ class User
     }
 
     /**
-     * @return mixed
-     */
-    public function getTeam()
-    {
-        return $this->team;
-    }
-
-    /**
-     * @param mixed $team
-     */
-    public function setTeam($team)
-    {
-        $this->team = $team;
-    }
-
-    /**
      * @return string
      */
     public function getIsBot()
@@ -372,4 +402,25 @@ class User
         $this->isBot = $isBot;
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'email' => $this->getEmail(),
+            'has_2fa' => $this->getHas2fa(),
+            'is_admin' => $this->getIsAdmin(),
+            'is_owner' => $this->getIsOwner(),
+            'is_bot' => $this->getIsBot(),
+            'deleted' => $this->getDeleted(),
+            'messages' => $this->getMessages()->toArray()
+        ];
+    }
 }

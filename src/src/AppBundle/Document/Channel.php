@@ -12,7 +12,7 @@ use DateTime;
  * @package AppBundle
  * @ODM\Document(collection="channel",repositoryClass="AppBundle\Document\Repository\ChannelRepository")
  */
-class Channel
+class Channel implements \JsonSerializable
 {
     /**
      * @ODM\Id(strategy="NONE")
@@ -20,7 +20,7 @@ class Channel
      */
     protected $id;
     /**
-     * @ODM\ReferenceOne(targetDocument="Team")
+     * @ODM\ReferenceOne(targetDocument="Team", inversedBy="channels")
      * @var Team
      */
     protected $team;
@@ -330,4 +330,19 @@ class Channel
         $this->lastMessage = $lastMessage;
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'num_members' => $this->getNumMebers()
+        ];
+    }
 }
