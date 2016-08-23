@@ -8,9 +8,4 @@ WORKDIR /opt/slack-api-export
 # Expose and run the build in php web server
 EXPOSE 8000
 
-ADD config/entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
 CMD [ "./bin/console", "server:run", "0.0.0.0:8000", "--env=prod" ]
