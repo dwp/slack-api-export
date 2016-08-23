@@ -20,4 +20,4 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     # MongoDB server url
-    mongodb_server: ~
+    mongodb_server: mongodb://mongo:27017
