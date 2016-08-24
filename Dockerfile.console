@@ -6,4 +6,7 @@ VOLUME /opt/slack-api-export/var/export
 COPY ./src /opt/slack-api-export
 WORKDIR /opt/slack-api-export
 
-CMD [ "./bin/console", "slack:export", "/opt/slack-api-export/var/export", "--env=prod" ]
+ADD config/entrypoint.console.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+CMD [ "list" ]

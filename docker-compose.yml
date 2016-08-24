@@ -22,27 +22,16 @@ services:
     volumes:
       - ./logs/http:/opt/slack-api-export/var/logs
 
-  sync:
+  console:
     build:
       context: .
-      dockerfile: Dockerfile.sync
+      dockerfile: Dockerfile.console
     depends_on:
       - base
     links:
       - mongo
     volumes:
-      - ./logs/sync:/opt/slack-api-export/var/logs
-
-  export:
-    build:
-      context: .
-      dockerfile: Dockerfile.export
-    depends_on:
-      - base
-    links:
-      - mongo
-    volumes:
-      - ./logs/export:/opt/slack-api-export/var/logs
+      - ./logs/console:/opt/slack-api-export/var/logs
       - ./export:/opt/slack-api-export/var/export
 
   mongo:

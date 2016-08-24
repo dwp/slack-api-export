@@ -5,6 +5,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\Channel;
 use AppBundle\Document\Message;
 use AppBundle\Document\Repository\MessageRepository;
+use AppBundle\Document\Team;
 
 /**
  * Basic service for interacting with Messages.

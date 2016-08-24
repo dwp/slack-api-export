@@ -14,8 +14,7 @@ This application is made up of the following Docker containers:
 
 1. A Symfony PHP application which contains the project code, this code is runnable in three different containers.
    1. http - this container runs a web server on port 8000.
-   2. sync - this container runs a command which synchronises data for any team which has added the app in Slack.
-   3. export - this container dumps all data within MongoDB to JSON files.
+   2. console - this container runs console command which allows the running of batch jobs.
 2. A localtunnel.me container which provides a tunnel to make the code accessible for the Slack OAuth exchange.
 3. A MongoDB database container.
 
@@ -42,8 +41,8 @@ At that point you can then visit https://yourtunnel.localtunnel.me/oauth and the
 
 ### Synchronising
 
-Run the sync container via ```docker-compose run sync``` which will cause the slack:sync command to run interactively.  This will suck down all data in to the MongoDB instance.
+Run the sync container via ```docker-compose run console slack:sync --update``` which will cause the slack:sync command to run interactively.  This will suck down all data in to the MongoDB instance.
 
 ### Exporting
 
-Run the sync container via ```docker-compose run export``` which will cause the slack:sync command to run interactively.  This will export all data in MongoDB to the /export directory within the project, with one JSON file being created for each team.
+Run the sync container via ```docker-compose run console slack:export ./var/export``` which will cause the slack:sync command to run interactively.  This will export all data in MongoDB to the /export directory within the project, with one JSON file being created for each team.

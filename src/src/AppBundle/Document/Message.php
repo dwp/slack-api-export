@@ -336,17 +336,17 @@ class Message implements \JsonSerializable
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return [
-            'id' => $this->getId(),
-            'timestamp' => $this->getTimestampDateTime()->format(\DateTime::ISO8601),
-            'type' => $this->getType(),
-            'sub_type' => $this->getSubType(),
-            'channel' => $this->getChannel()->getName(),
-            'text' => $this->getText(),
-            'reactions' => $this->getReactions()->toArray(),
-            'is_bot' => $this->getIsBot(),
+            'id' => (string) $this->getId(),
+            'timestamp' => (string) $this->getTimestampDateTime()->format(\DateTime::ISO8601),
+            'type' => (string) $this->getType(),
+            'sub_type' => (string) $this->getSubType(),
+            'channel' => (string) $this->getChannel()->getName(),
+            'text' => (string) $this->getText(),
+            'reactions' => (array) $this->getReactions()->toArray(),
+            'is_bot' => (bool) $this->getIsBot(),
         ];
     }
 }

@@ -25,6 +25,11 @@ class Channel implements \JsonSerializable
      */
     protected $team;
     /**
+     * @ODM\ReferenceMany(targetDocument="Message", mappedBy="channel")
+     * @var Message[]
+     */
+    protected $messages;
+    /**
      * @ODM\ReferenceMany(targetDocument="User")
      * @var ArrayCollection;
      */
@@ -135,6 +140,14 @@ class Channel implements \JsonSerializable
     public function setTeam($team)
     {
         $this->team = $team;
+    }
+
+    /**
+     * @return Message[]
+     */
+    public function getMessages()
+    {
+        return $this->messages;
     }
 
     /**

@@ -1,8 +1,0 @@
-FROM slackapiexport_base
-
-VOLUME /opt/slack-api-export/var/logs
-
-COPY ./src /opt/slack-api-export
-WORKDIR /opt/slack-api-export
-
-CMD [ "./bin/console", "slack:sync", "--update", "--env=prod" ]
