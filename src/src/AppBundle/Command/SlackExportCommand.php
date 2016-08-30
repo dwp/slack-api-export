@@ -6,8 +6,10 @@ use AppBundle\Document\Channel;
 use AppBundle\Document\Team;
 use AppBundle\Document\User;
 use AppBundle\Service\ChannelService;
+use AppBundle\Service\MessageService;
 use AppBundle\Service\TeamService AS TeamService;
 use AppBundle\Service\UserService AS UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +35,12 @@ class SlackExportCommand extends ContainerAwareCommand
                 'export-dir',
                 InputArgument::REQUIRED,
                 'The directory which the export files should be output.'
+            )->addOption(
+                'since',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'A timestamp to export messages since in a YYYY-MM-DD.',
+                '2010-12-31 00:00'
             );
         ;
     }
@@ -46,6 +54,9 @@ class SlackExportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // try and parse since date
+        $since = new \DateTime($input->getOption('since'));
+        $output->writeln(sprintf("> Exporting data since %s", $since->format(\DateTime::ISO8601)));
         // get export directory
         $exportDir = realpath($input->getArgument('export-dir'));
         $output->writeln(sprintf("> Starting the export process to %s", $exportDir));
@@ -55,9 +66,34 @@ class SlackExportCommand extends ContainerAwareCommand
             // start team output
             $output->writeln(sprintf(">> Outputing %s.json for %s.", $team->getDomain(), $team->getName()));
             $exportFile = $exportDir . DIRECTORY_SEPARATOR . $team->getDomain() . '.json';
-            file_put_contents($exportFile, json_encode($team));
+            file_put_contents(
+                $exportFile,
+                json_encode(
+                    $this->prepareTeamData($team, $since)
+                )
+            );
         }
         $output->writeln(sprintf("> Export complete."));
+    }
+
+    /**
+     * Prepare team information and ensure the correct messages are hydrated.
+     *
+     * @param Team $team
+     * @param \DateTime $since
+     * @return array
+     */
+    private function prepareTeamData(Team $team, \DateTime $since)
+    {
+        /** @var User $user */
+        $data = $team->jsonSerialize();
+        unset($data['users']);
+        foreach($team->getUsers() AS $user) {
+            $userData = $user->jsonSerialize();
+            $userData['messages'] = $this->getMessageService()->findByUserSince($user, $since);
+            $data['users'][] = $userData;
+        }
+        return $data;
     }
 
     /**
@@ -82,6 +118,14 @@ class SlackExportCommand extends ContainerAwareCommand
     protected function getUserService()
     {
         return $this->getContainer()->get('app.service.user');
+    }
+
+    /**
+     * @return MessageService
+     */
+    protected function getMessageService()
+    {
+        return $this->getContainer()->get('app.service.message');
     }
 
 }

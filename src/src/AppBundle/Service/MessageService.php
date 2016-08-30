@@ -6,6 +6,8 @@ use AppBundle\Document\Channel;
 use AppBundle\Document\Message;
 use AppBundle\Document\Repository\MessageRepository;
 use AppBundle\Document\Team;
+use AppBundle\Document\User;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * Basic service for interacting with Messages.
@@ -86,5 +88,43 @@ class MessageService
                 $reaction->addUser($this->users->get($userId));
             }
         }
+    }
+
+    /**
+     * Method to retrieve messages from a channel since a defined date.
+     *
+     * @param Channel $channel
+     * @param \DateTime $since
+     * @return Message[]
+     */
+    public function findByChannelSince(Channel $channel, \DateTime $since)
+    {
+        $qb = $this->repository->createQueryBuilder()
+            ->field('channel')->equals($channel)
+            ->field('createdAt')->gte($since);
+        $cursor = $qb->getQuery()->execute();
+        $result = [];
+        foreach ($cursor AS $message) {
+            $result[] = $message;
+        }
+        return $result;
+    }
+
+    /**
+     * @param User $user
+     * @param \DateTime $since
+     * @return Message[]
+     */
+    public function findByUserSince(User $user, \DateTime $since)
+    {
+        $qb = $this->repository->createQueryBuilder()
+            ->field('user')->equals($user)
+            ->field('createdAt')->gte($since);
+        $cursor = $qb->getQuery()->execute();
+        $result = [];
+        foreach ($cursor AS $message) {
+            $result[] = $message;
+        }
+        return $result;
     }
 }

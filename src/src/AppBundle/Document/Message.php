@@ -65,6 +65,11 @@ class Message implements \JsonSerializable
      */
     protected $timestamp;
     /**
+     * @ODM\Field(type="date", name="created_at")
+     * @var DateTime
+     */
+    protected $createdAt;
+    /**
      * @ODM\Field(type="boolean", name="upload")
      * @var boolean
      */
@@ -97,6 +102,7 @@ class Message implements \JsonSerializable
         $this->type = $data['type'];
         $this->subType = $this->returnIfPresent($data, 'subtype');
         $this->timestamp = $data['ts'];
+        $this->createdAt = new \DateTime("@" . intval($data['ts']));
         $this->text = $data['text'];
         $this->isUpload = $this->returnIfPresent($data, 'upload');
         $this->isBot = $this->returnIfPresent($data, 'is_bot');
@@ -279,6 +285,22 @@ class Message implements \JsonSerializable
     public function setTimestamp($timestamp)
     {
         $this->timestamp = $timestamp;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTime $createdAt
+     */
+    public function setCreatedAt($createdAt = null)
+    {
+        $this->createdAt = $createdAt;
     }
 
     /**

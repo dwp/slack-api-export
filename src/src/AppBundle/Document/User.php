@@ -420,7 +420,6 @@ class User implements \JsonSerializable
             'is_owner' => $this->getIsOwner(),
             'is_bot' => $this->getIsBot(),
             'deleted' => $this->getDeleted(),
-            'messages' => $this->getMessages()->toArray()
         ];
     }
 }
