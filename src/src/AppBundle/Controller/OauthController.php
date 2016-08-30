@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class OauthController extends Controller
 {
     /**
-     * @Route("/oauth", name="oauth")
+     * @Route("/oauth", name="app.oauth")
      */
     public function indexAction(Request $request)
     {

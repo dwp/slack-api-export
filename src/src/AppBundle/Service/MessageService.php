@@ -7,6 +7,7 @@ use AppBundle\Document\Message;
 use AppBundle\Document\Repository\MessageRepository;
 use AppBundle\Document\Team;
 use AppBundle\Document\User;
+use AppBundle\Service\Exception\ServiceException;
 use Doctrine\Common\Collections\Criteria;
 
 /**
@@ -53,15 +54,12 @@ class MessageService
     public function updateFromApi(Channel $channel, $data)
     {
         // does this message already exist?
-        /** @var Message $message */
-        $message = $this->repository->findOneBy([
-            'channel' => $channel,
-            'ts' => $data['ts']
-        ]);
-        if (is_null($message)) {
+        try {
+            $message = $this->findUniqueMessage($channel, $data['ts']);
+            $message->updateFromApiData($data);
+        } catch (ServiceException $e) {
             // none found so create
             $message = new Message($channel, $data);
-            // populate key users.
             if (array_key_exists('user', $data)) {
                 $message->setUser($this->users->get($data['user']));
             }
@@ -69,11 +67,30 @@ class MessageService
                 $message->setInviter($this->users->get($data['inviter']));
             }
             $this->repository->getDocumentManager()->persist($message);
-        } else {
-            $message->updateFromApiData($data);
         }
         // if we have reactions, also ensure user data is present
         $this->updateReactions($data, $message);
+        return $message;
+    }
+
+    /**
+     * @param Channel $channel
+     * @param $ts
+     * @return Message
+     * @throws ServiceException
+     */
+    public function findUniqueMessage(Channel $channel, $ts)
+    {
+        /** @var Message $message */
+        $message = $this->repository->findOneBy([
+            'channel' => $channel,
+            'ts' => $ts
+        ]);
+        if (is_null($message)) {
+            throw new ServiceException(
+                sprintf('No message found for channel %s and timestamp $%s', $channel->getName(), $ts)
+            );
+        }
         return $message;
     }
 

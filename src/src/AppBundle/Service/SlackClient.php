@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\Team AS Team;
 use AppBundle\Service\Exception\SlackException;
+use AppBundle\Slack\Event\EventInterface;
 use GuzzleHttp\Client AS GuzzleClient;
 use League\OAuth2\Client\Token\AccessToken;
 
@@ -95,4 +96,5 @@ class SlackClient
     {
         return $this->token;
     }
+
 }

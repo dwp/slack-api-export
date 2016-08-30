@@ -16,6 +16,10 @@ services:
           - "@app.guzzle"
           - "https://api.slack.com/api"
 
+    app.service.event:
+        class: AppBundle\Service\EventService
+        arguments: [ "@app.service.user", "@app.service.team", "@app.service.message" ]
+
     app.service.auth:
         class: AppBundle\Service\AuthService
         arguments: [ "@app.service.slack_client", "@app.document.repository.auth", "@app.service.team" ]
