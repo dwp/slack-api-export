@@ -2,13 +2,9 @@
 
 namespace AppBundle\Controller;
 
-use AdamPaterson\OAuth2\Client\Provider\Slack AS SlackOauthProvider;
-use AppBundle\Document\Auth;
-use AppBundle\Service\AuthService;
-use AppBundle\Service\SlackClient;
+use AppBundle\Service\EventService;
 use AppBundle\Slack\EventFactory;
-use CL\Slack\Payload\AuthTestPayload;
-use Monolog\Logger;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,14 +15,33 @@ class WebhookController extends Controller
 {
     /**
      * @Route("/webhook", name="app.webhook")
+     * @Method({"POST"})
      */
     public function indexAction(Request $request)
     {
-        // validate the request - always have a token
-        $data = json_decode($request->getContent());
+        // prepare our data
+        $data = json_decode($request->getContent(), true);
+        if (empty($data)) {
+            throw new BadRequestHttpException("Invalid request format - no JSON found.");
+        }
+
+        // validate request token and then ensure our event can be created
+        if (getenv('SLACK_TOKEN') !== $data['token']) {
+            throw new BadRequestHttpException('Invalid token.');
+        }
         $event = EventFactory::factory($data);
+        $this->getEventService()->process($event);
 
         // return our response from the message
         return new JsonResponse($event);
+    }
+
+    /**
+     * Helper function to type hint the container.
+     * @return EventService
+     */
+    private function getEventService()
+    {
+        return $this->get('app.service.event');
     }
 }

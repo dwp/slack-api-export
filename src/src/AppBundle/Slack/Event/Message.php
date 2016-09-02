@@ -8,14 +8,12 @@
 
 namespace AppBundle\Slack\Event;
 
-use AppBundle\Service\EventService;
-
 /**
  * Class Message representing an actual message in channel.
  *
  * @package AppBundle\Slack\Event
  */
-class Message extends AbstractMessage implements EventInterface
+class Message extends AbstractEvent implements EventInterface
 {
     /**
      * Specify data which should be serialized to JSON
@@ -24,10 +22,11 @@ class Message extends AbstractMessage implements EventInterface
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return [
             'type' => 'message'
         ];
     }
+
 }

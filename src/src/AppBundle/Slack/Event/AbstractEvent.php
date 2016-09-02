@@ -8,12 +8,14 @@
 
 namespace AppBundle\Slack\Event;
 
+use InvalidArgumentException; // probably not correct exception
+
 /**
  * Class AbstractMessage for storing all event data.
  *
  * @package AppBundle\Slack\Event
  */
-abstract class AbstractMessage
+abstract class AbstractEvent
 {
     /**
      * @var string
@@ -22,6 +24,7 @@ abstract class AbstractMessage
 
     /**
      * AbstractMessage constructor to store the message data
+     *
      * @param $data
      */
     public function __construct($data)

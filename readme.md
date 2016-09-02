@@ -28,6 +28,7 @@ Once your app is created you need to copy *.env.dist* to *.env* and update it wi
 2. **SLACK_CLIENT_ID** - This is the oauth client ID which you obtain from Slack when setting up your app.
 3. **SLACK_CLIENT_SECRET** - This is the oauth client secret which you obtain from Slack when setting up your app.  
 4. **SLACK_CLIENT_REDIRECT_URI** - This is the URL which Slack will redirect back to after completing the oauth process - it is normally of the format ```${TUNNEL_HOSTNAME}.localtunnel.me/oauth```.
+5. **SLACK_TOKEN** - The secret token on your Slack app setup screen which is used to validate incomming webhook and Event API requests are comming from slack.
 
 Once you have this *.env* file setup and configured you should be ready to start your application.
 

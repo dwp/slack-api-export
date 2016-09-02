@@ -52,7 +52,7 @@ class OauthController extends Controller
 
             // invalid session so destroy the session and throw
             $this->getSession()->clear();
-            throw new BadRequestHttpException('Invalid state');
+            throw new BadRequestHttpException('Invalid oauth state');
 
         } else {
 

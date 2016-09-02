@@ -58,14 +58,13 @@ class EventFactory
     static private function parseMessageType($data)
     {
         // need to parse if this is a "special" event
-        switch($data->type)
-        {
+        switch($data['type']) {
             case 'event_callback':
-                return (string) $data->event->type;
+                return (string) $data['event']['type'];
             case 'url_verification':
-                return (string) $data->type;
+                return (string) $data['type'];
             default:
-                throw new \InvalidArgumentException(sprintf('Unknown envelope type of %s.', $data->type));
+                throw new \InvalidArgumentException(sprintf('Unknown envelope type of %s.', $data['type']));
         }
     }
 }

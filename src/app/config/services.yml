@@ -18,7 +18,7 @@ services:
 
     app.service.event:
         class: AppBundle\Service\EventService
-        arguments: [ "@app.service.user", "@app.service.team", "@app.service.message" ]
+        arguments: [ "@logger", "@app.service.user", "@app.service.channel", "@app.service.message", "@doctrine_mongodb.odm.document_manager" ]
 
     app.service.auth:
         class: AppBundle\Service\AuthService

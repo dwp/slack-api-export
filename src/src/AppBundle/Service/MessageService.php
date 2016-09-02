@@ -9,6 +9,7 @@ use AppBundle\Document\Team;
 use AppBundle\Document\User;
 use AppBundle\Service\Exception\ServiceException;
 use Doctrine\Common\Collections\Criteria;
+use Monolog\Logger;
 
 /**
  * Basic service for interacting with Messages.

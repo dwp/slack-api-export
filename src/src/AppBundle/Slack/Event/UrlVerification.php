@@ -11,7 +11,7 @@ namespace AppBundle\Slack\Event;
 
 use AppBundle\Service\EventService;
 
-class UrlVerification implements EventInterface
+class UrlVerification extends AbstractEvent implements EventInterface
 {
     /**
      * @var string
@@ -22,6 +22,7 @@ class UrlVerification implements EventInterface
     {
         $this->challenge = $data->challenge;
         $this->token = $data->token;
+        parent::__construct($data);
     }
 
     /**

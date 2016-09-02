@@ -6,6 +6,7 @@ use AppBundle\Document\Channel;
 use AppBundle\Document\Message;
 use AppBundle\Document\Team;
 use AppBundle\Document\Repository\ChannelRepository;
+use AppBundle\Service\Exception\ServiceException;
 
 /**
  * Basic service for interacting with Channels.
@@ -136,5 +137,21 @@ class ChannelService
         if (true === (bool) $messages['has_more']) {
            $this->syncHistory($channel, $message->getTimestamp(), $oldest);
         }
+    }
+
+    /**
+     * Method to lookup a channel in the local database.
+     *
+     * @param string $id
+     * @return Channel
+     * @throws ServiceException
+     */
+    public function get($id)
+    {
+        $channel = $this->repository->find($id);
+        if (empty($channel)) {
+            throw new ServiceException('Unknown channel with id of %s.', $id);
+        }
+        return $channel;
     }
 }
