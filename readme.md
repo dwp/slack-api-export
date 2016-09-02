@@ -47,3 +47,5 @@ Run the sync command in the console container via ```docker-compose run console 
 ### Exporting
 
 Run the export command in the console container via ```docker-compose run console slack:export ./var/export``` which will cause the slack:sync command to run interactively.  This will export all data in MongoDB to the /export directory within the project, with one JSON file being created for each team.
+
+This command can optioally take a ```--since=2016-08-01``` or similar command switch to only export data since 2016-08-01 or any other supplied date and time.
