@@ -3,6 +3,7 @@ services:
 
   base:
     build: .
+    image: slackapiexport_base
 
   http:
     build:
