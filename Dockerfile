@@ -15,6 +15,17 @@ COPY config/php.ini /usr/local/etc/php/
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
+VOLUME /opt/slack-api-export/var/logs
+VOLUME /opt/slack-api-export/var/export
+
+COPY ./src /opt/slack-api-export
+WORKDIR /opt/slack-api-export
+
+# install composer
+RUN rm -rf /opt/slack-api-export/var/cache/*
+RUN rm -rf /opt/slack-api-export/var/logs/*
+RUN composer install --no-interaction --no-ansi
+
 # setup entrypoint
 ADD config/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh

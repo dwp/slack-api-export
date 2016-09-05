@@ -1,11 +1,6 @@
 FROM slackapiexport_base
 
-VOLUME /opt/slack-api-export/var/logs
-VOLUME /opt/slack-api-export/var/export
-
-COPY ./src /opt/slack-api-export
-WORKDIR /opt/slack-api-export
-
+# swap our entry point
 ADD config/entrypoint.console.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

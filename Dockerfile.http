@@ -1,10 +1,5 @@
 FROM slackapiexport_base
 
-VOLUME /opt/slack-api-export/var/logs
-
-COPY ./src /opt/slack-api-export
-WORKDIR /opt/slack-api-export
-
 # Expose and run the build in php web server
 EXPOSE 8000
 

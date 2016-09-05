@@ -6,12 +6,5 @@ if [ ! -f '.env' ]; then
     exit
 fi
 
-# Install composer in to local user exec directory on OSX
-echo "Installing Composer via homebrew."
-brew install composer
-
-# Install package dependencies
-composer install --no-interaction --no-ansi -d ./src
-
 # and run docker-compose
-docker-compose up
+docker-compose up --build
