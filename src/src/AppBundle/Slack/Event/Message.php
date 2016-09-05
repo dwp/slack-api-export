@@ -15,6 +15,7 @@ namespace AppBundle\Slack\Event;
  */
 class Message extends AbstractEvent implements EventInterface
 {
+    const TYPE = 'message';
     /**
      * Specify data which should be serialized to JSON
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
@@ -25,7 +26,7 @@ class Message extends AbstractEvent implements EventInterface
     public function jsonSerialize()
     {
         return [
-            'type' => 'message'
+            'type' => self::TYPE
         ];
     }
 

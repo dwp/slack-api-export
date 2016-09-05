@@ -55,7 +55,7 @@ class SlackClient
         $response = $this->guzzleClient->get($this->formatRequestUrl($method), $options);
         $jsonResponse = json_decode($response->getBody(), true);
         if (false === $jsonResponse['ok']) {
-            // we have an error, format some information dd d d d
+            // we have an error, format some information
             throw new SlackException($jsonResponse['error']);
         }
         return $jsonResponse;

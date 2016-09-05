@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Service\EventService;
+use AppBundle\Service\SlackClient;
+use AppBundle\Service\TeamService;
 use AppBundle\Slack\EventFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -29,6 +31,12 @@ class WebhookController extends Controller
         if (getenv('SLACK_TOKEN') !== $data['token']) {
             throw new BadRequestHttpException('Invalid token.');
         }
+
+        // ensure we have a valid team
+        $team = $this->getTeamService()->get($data['team_id']);
+        $this->getSlackClient()->setToken($team);
+
+        // and proces the event
         $event = EventFactory::factory($data);
         $this->getEventService()->process($event);
 
@@ -43,5 +51,22 @@ class WebhookController extends Controller
     private function getEventService()
     {
         return $this->get('app.service.event');
+    }
+
+    /**
+     * Helper function to type hint the container.
+     * @return TeamService
+     */
+    private function getTeamService()
+    {
+        return $this->get('app.service.team');
+    }
+    /**
+     * Helper function to type hint the container.
+     * @return SlackClient
+     */
+    private function getSlackClient()
+    {
+        return $this->get('app.service.slack_client');
     }
 }

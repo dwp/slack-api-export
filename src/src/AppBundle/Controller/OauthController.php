@@ -35,7 +35,6 @@ class OauthController extends Controller
                 'scope' => [
                     'channels:history',
                     'channels:read',
-                    'dnd:read',
                     'team:read',
                     'users.profile:read',
                     'users:read'

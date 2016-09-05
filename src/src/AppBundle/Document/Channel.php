@@ -114,7 +114,7 @@ class Channel implements \JsonSerializable
         $this->isArchived = $data['is_archived'];
         $this->isGeneral = $data['is_general'];
         $this->isMember = $data['is_member'];
-        $this->numMebers = $data['num_members'];
+        $this->numMebers = count($data['members']);
         $this->createdAt = new \DateTime("@" . $data['created']);
     }
 

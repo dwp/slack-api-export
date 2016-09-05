@@ -3,10 +3,6 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\Channel;
-use AppBundle\Document\Message;
-use AppBundle\Document\Team;
-use AppBundle\Document\Repository\ChannelRepository;
-use AppBundle\Slack\Event\EventEntityMappingException;
 use AppBundle\Slack\Event\EventInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
@@ -66,17 +62,21 @@ class EventService
     }
 
     /**
-     * Primary method to process an event.
+     * Primary method to process an event - this is horrible code, just need to get it working can be refactored later
+     * on.
+     *
+     * @todo refactor this shonky code.
      * @param EventInterface $event
      */
     public function process(EventInterface $event)
     {
         if ($event instanceof \AppBundle\Slack\Event\Message) {
+            // message
             $channel = $this->channelService->get($event->getData()['event']['channel']);
             $message = $this->messageService->updateFromApi($channel, $event->getData()['event']);
-            $this->documentManager->flush($message);
             $this->logger->info(sprintf("Message logged %s from Event API.", $message->getId()));
         }
+        $this->documentManager->flush();
     }
 
 }

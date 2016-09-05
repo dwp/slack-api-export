@@ -26,7 +26,7 @@ services:
 
     app.service.channel:
         class: AppBundle\Service\ChannelService
-        arguments: [ "@app.service.slack_client", "@app.document.repository.channel", "@app.service.message" ]
+        arguments: [ "@app.service.slack_client", "@app.document.repository.channel", "@app.service.message", "@logger" ]
 
     app.service.message:
         class: AppBundle\Service\MessageService
@@ -34,7 +34,7 @@ services:
 
     app.service.user:
         class: AppBundle\Service\UserService
-        arguments: [ "@app.service.slack_client", "@app.document.repository.user" ]
+        arguments: [ "@app.service.slack_client", "@app.document.repository.user", "@logger" ]
 
     app.service.team:
         class: AppBundle\Service\TeamService

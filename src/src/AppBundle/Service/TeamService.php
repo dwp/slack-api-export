@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\Team;
 use AppBundle\Document\Repository\TeamRepository;
+use AppBundle\Service\Exception\ServiceException;
 
 /**
  * Basic service for interacting with Teams.
@@ -58,6 +59,22 @@ class TeamService
         } else {
             // otherwise just update
             $team->updateFromApiData($data);
+        }
+        return $team;
+    }
+
+    /**
+     * Method to lookup a team in the local database.
+     *
+     * @param string $id
+     * @return Team,
+     * @throws ServiceException
+     */
+    public function get($id)
+    {
+        $team = $this->repository->find($id);
+        if (empty($team)) {
+            throw new ServiceException(sprintf('Unknown team document for %s.', $id));
         }
         return $team;
     }

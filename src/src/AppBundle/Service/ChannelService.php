@@ -7,6 +7,7 @@ use AppBundle\Document\Message;
 use AppBundle\Document\Team;
 use AppBundle\Document\Repository\ChannelRepository;
 use AppBundle\Service\Exception\ServiceException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Basic service for interacting with Channels.
@@ -29,17 +30,28 @@ class ChannelService
     protected $messages;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Slack constructor to setup the service.
      *
      * @param SlackClient $slack
      * @param ChannelRepository $repository
      * @param MessageService $messages
      */
-    public function __construct(SlackClient $slack, ChannelRepository $repository, MessageService $messages)
+    public function __construct(
+        SlackClient $slack,
+        ChannelRepository $repository,
+        MessageService $messages,
+        LoggerInterface $logger
+    )
     {
         $this->slack = $slack;
         $this->repository = $repository;
         $this->messages = $messages;
+        $this->logger = $logger;
     }
 
     /**
@@ -140,7 +152,7 @@ class ChannelService
     }
 
     /**
-     * Method to lookup a channel in the local database.
+     * Method to retrieve a channel from mongodb, will populate from the API if possible.
      *
      * @param string $id
      * @return Channel
@@ -149,9 +161,36 @@ class ChannelService
     public function get($id)
     {
         $channel = $this->repository->find($id);
-        if (empty($channel)) {
-            throw new ServiceException('Unknown channel with id of %s.', $id);
+        if (is_null($channel)) {
+            // try and populate
+            //try {
+                $channel = $this->populate($id);
+            //} catch (\Exception $e) {
+            //    throw new ServiceException(sprintf('Unable to locate channel for %s.', $id), 0, $e);
+            //}
         }
         return $channel;
+    }
+
+    /**
+     * Method to call the Slack API for user credentials, and then populate the Document.  Have to assume that the
+     * applications is in the correct slack api context and has been pre-configured with the correct OAuth token.
+     *
+     * @param $id
+     * @return Channel
+     * @throws ServiceException
+     */
+    public function populate($id)
+    {
+        $response = $this->slack->get(
+            '/channels.info',
+            [
+                'query' => [
+                    'channel' => $id
+                ]
+            ]
+        );
+        $this->logger->info('Retrieving channels.info from Slack API.', $response);
+        return $this->updateFromApi($response['channel']);
     }
 }

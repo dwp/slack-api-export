@@ -6,6 +6,7 @@ use AppBundle\Document\Team;
 use AppBundle\Document\User;
 use AppBundle\Document\Repository\UserRepository;
 use AppBundle\Service\Exception\ServiceException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Basic service for interacting with users.
@@ -23,6 +24,11 @@ class UserService
     protected $repository;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Slack constructor to setup the service.
      *
      * @param SlackClient $slack
@@ -30,11 +36,13 @@ class UserService
      */
     public function __construct(
         SlackClient $slack,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        LoggerInterface $logger
     )
     {
         $this->slack = $slack;
         $this->repository = $userRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -80,18 +88,45 @@ class UserService
     }
 
     /**
-     * Method to retrieve a user from mongodb.
+     * Method to retrieve a user from mongodb, will populate from the API if possible.
      *
-     * @param $userId
+     * @param $id
      * @return User
      * @throws ServiceException
      */
-    public function get($userId)
+    public function get($id)
     {
-        $user = $this->repository->find($userId);
+        $user = $this->repository->find($id);
         if (is_null($user)) {
-            throw new ServiceException(sprintf('Unable to locate user %s.', $userId));
+            // try and populate
+            try {
+                $user = $this->populate($id);
+            } catch (\Exception $e) {
+                throw new ServiceException(sprintf('Unable to locate user for %s.', $id), 0, $e);
+            }
         }
         return $user;
+    }
+
+    /**
+     * Method to call the Slack API for user credentials, and then populate the Document.  Have to assume that the
+     * applications is in the correct slack api context and has been pre-configured with the correct OAuth token.
+     *
+     * @param $id
+     * @return User
+     * @throws ServiceException
+     */
+    public function populate($id)
+    {
+        $response = $this->slack->get(
+            '/users.info',
+            [
+                'query' => [
+                    'user' => $id
+                ]
+            ]
+        );
+        $this->logger->info('Retrieving users.info from Slack API.', $response);
+        return $this->updateFromApi($response['user']);
     }
 }
