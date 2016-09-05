@@ -28,7 +28,7 @@ Once your app is created you need to copy *.env.dist* to *.env* and update it wi
 2. **SLACK_CLIENT_ID** - This is the oauth client ID which you obtain from Slack when setting up your app.
 3. **SLACK_CLIENT_SECRET** - This is the oauth client secret which you obtain from Slack when setting up your app.  
 4. **SLACK_CLIENT_REDIRECT_URI** - This is the URL which Slack will redirect back to after completing the oauth process - it is normally of the format ```${TUNNEL_HOSTNAME}.localtunnel.me/oauth```.
-5. **SLACK_TOKEN** - The secret token on your Slack app setup screen which is used to validate incomming webhook and Event API requests are comming from slack.
+5. **SLACK_TOKEN** - The secret token on your Slack app setup screen which is used to validate incomming webhook and Event API requests are comming from slack.  This token is shown on the Slack OAuth settings screen after you have first configured an event subscription message type.
 
 Once you have this *.env* file setup and configured you should be ready to start your application.
 
@@ -49,3 +49,12 @@ Run the sync command in the console container via ```docker-compose run console 
 Run the export command in the console container via ```docker-compose run console slack:export ./var/export``` which will cause the slack:sync command to run interactively.  This will export all data in MongoDB to the /export directory within the project, with one JSON file being created for each team.
 
 This command can optioally take a ```--since=2016-08-01``` or similar command switch to only export data since 2016-08-01 or any other supplied date and time.
+
+### Events
+
+If online, the app is also able to receive events - the only event currently supported are "message" events.  In order to configure the application to receive event subscrption data you must configure the webhook settings within your Team's setup screen.
+
+* The webhook URL for receiving events needs to be set at ```${TUNNEL_HOSTNAME}.localtunnel.me/webhook``` on the slack app "Event Subscriptions" configuration page.
+* Once the URL is configured, also please add the ```message.channels``` event type and enable the event subscription.
+ 
+The app will only continue to receive events in realtime when both the http and tunnel containers are online and operational.
