@@ -8,4 +8,3 @@ WORKDIR /var/www/slack-api-export
 RUN rm -rf /opt/slack-api-export/var/cache/*
 RUN rm -rf /opt/slack-api-export/var/logs/*
 RUN composer install --no-interaction --no-ansi
-
