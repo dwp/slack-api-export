@@ -1,0 +1,11 @@
+FROM nginx
+
+# copy our actual files
+COPY ./src /var/www/slack-api-export
+WORKDIR /var/www/slack-api-export
+
+# install composer
+RUN rm -rf /opt/slack-api-export/var/cache/*
+RUN rm -rf /opt/slack-api-export/var/logs/*
+RUN composer install --no-interaction --no-ansi
+
