@@ -25,7 +25,7 @@ class NewMessageSubscriber implements EventSubscriber
     public function __construct($savePath)
     {
         // ensure directory is present
-        $this->savePath = realpath($savePath);
+        $this->savePath = $savePath;
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath, 0777, true);
         }
@@ -44,11 +44,29 @@ class NewMessageSubscriber implements EventSubscriber
         // just return if the user is a  bot
         if ($document->getUser()->getIsBot()) return;
 
+        // ensure that the team log directory is present
+        if (!is_dir($this->getSavePath($document))) {
+            mkdir($this->getSavePath($document), 0777, true);
+        }
+
         // need to emit the event - writing to filesystem at the moment - one log per day with one entry per line
-        $data = $document->eventArray();
-        $handle = fopen($this->savePath . "/" . $document->getTimestampDateTime()->format('Y-m-d') . ".log", "a");
-        fwrite($handle, json_encode($data) . PHP_EOL );
+        $handle = fopen(
+            $this->getSavePath($document) . "/" . $document->getTimestampDateTime()->format('Y-m-d') . ".log",
+            "a"
+        );
+        fwrite($handle, json_encode($document->eventArray()) . PHP_EOL );
         fclose($handle);
+    }
+
+    /**
+     * Helper to get team save path.
+     *
+     * @param Message $message
+     * @return string
+     */
+    private function getSavePath(Message $message)
+    {
+        return $this->savePath . DIRECTORY_SEPARATOR . $message->getUser()->getTeam()->getDomain();
     }
 
     /**
