@@ -1,5 +1,8 @@
 FROM nginx
 
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
+
 # copy our actual files
 COPY ./src /var/www/slack-api-export
 WORKDIR /var/www/slack-api-export
