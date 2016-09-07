@@ -371,4 +371,26 @@ class Message implements \JsonSerializable
             'is_bot' => (bool) $this->getIsBot(),
         ];
     }
+
+    /**
+     * Method to get custom format required for event emission - need to flatten to a single object, not the best to
+     * have two methods which do a similar thing... hay ho...
+     *
+     * @return array
+     */
+    public function eventArray()
+    {
+        return [
+            'id' => (string) $this->getId(),
+            'channel' => (string) $this->getChannel()->getName(),
+            'user' => [
+                'id' => (string) $this->getUser()->getId(),
+                'name' => (string) $this->getUser()->getName()
+            ],
+            'type' => (string) $this->getType(),
+            'sub_type' => $this->getSubType(),
+            'text' => (string) $this->getText(),
+            'timestamp' => (string) $this->getTimestampDateTime()->format(\DateTime::ISO8601),
+        ];
+    }
 }

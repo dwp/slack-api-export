@@ -6,6 +6,7 @@ use AppBundle\Document\Channel;
 use AppBundle\Document\Team;
 use AppBundle\Document\User;
 use AppBundle\Service\ChannelService;
+use AppBundle\Service\Exception\SlackException;
 use AppBundle\Service\TeamService AS TeamService;
 use AppBundle\Service\UserService AS UserService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -51,37 +52,51 @@ class SlackSyncCommand extends ContainerAwareCommand
         $teams = $this->getTeamService()->findAll();
         /** @var Team $team */
         foreach ($teams AS $team) {
-
-            $output->writeln(sprintf("> Syncing team: %s", $team->getName()));
-
-            $output->writeln(">> Retrieving user data...");
-            $users = $this->getUserService()->syncTeam($team);
-            /** @var User $user */
-            foreach($users AS $user) {
-                $output->writeln(sprintf(">>> Syncing user - %s", $user->getName()));
+            try {
+                $this->syncTeam($team, $input, $output);
+            } catch (SlackException $e) {
+                $output->writeln(sprintf(">> Unable to sync team due to slack error - %s.", $e->getMessage()));
             }
-            unset($users, $user);
-
-            $output->writeln(">> Retrieving channel data...");
-            $channels = $this->getChannelService()->syncTeam($team);
-            /** @var Channel $channel */
-            foreach($channels AS $channel) {
-                if ($input->getOption('update')) {
-                    $output->writeln(sprintf(">>> Updating channel history - %s", $channel->getName()));
-                    $oldestMessage = 0;
-                    if ($channel->getLastMessage() instanceof \DateTime) {
-                        $oldestMessage = (string) $channel->getLastMessage()->getTimestamp();
-                    }
-                    $this->getChannelService()->syncHistory($channel, null, $oldestMessage);
-                } else {
-                    $output->writeln(sprintf(">>> Syncing channel history - %s", $channel->getName()));
-                    $this->getChannelService()->syncHistory($channel);
-                }
-            }
-            unset($channels, $channel);
-
         }
-        $output->writeln(sprintf("> Syncronisation complete."));
+        $output->writeln(sprintf("> Synchronisation complete."));
+    }
+
+    /**
+     * Self contained method to sync a team
+     *
+     * @param Team $team
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    private function syncTeam(Team $team, InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln(sprintf("> Syncing team: %s", $team->getName()));
+
+        $output->writeln(">> Retrieving user data...");
+        $users = $this->getUserService()->syncTeam($team);
+        /** @var User $user */
+        foreach($users AS $user) {
+            $output->writeln(sprintf(">>> Syncing user - %s", $user->getName()));
+        }
+        unset($users, $user);
+
+        $output->writeln(">> Retrieving channel data...");
+        $channels = $this->getChannelService()->syncTeam($team);
+        /** @var Channel $channel */
+        foreach($channels AS $channel) {
+            if ($input->getOption('update')) {
+                $output->writeln(sprintf(">>> Updating channel history - %s", $channel->getName()));
+                $oldestMessage = 0;
+                if ($channel->getLastMessage() instanceof \DateTime) {
+                    $oldestMessage = (string) $channel->getLastMessage()->getTimestamp();
+                }
+                $this->getChannelService()->syncHistory($channel, null, $oldestMessage);
+            } else {
+                $output->writeln(sprintf(">>> Syncing channel history - %s", $channel->getName()));
+                $this->getChannelService()->syncHistory($channel);
+            }
+        }
+        unset($channels, $channel);
     }
 
     /**
