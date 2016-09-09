@@ -382,13 +382,8 @@ class Message implements \JsonSerializable
     {
         return [
             'id' => (string) $this->getId(),
-            'channel' => (string) $this->getChannel()->getName(),
-            'user' => [
-                'id' => (string) $this->getUser()->getId(),
-                'name' => (string) $this->getUser()->getName()
-            ],
-            'type' => (string) $this->getType(),
-            'sub_type' => $this->getSubType(),
+            'user_id' => (string) $this->getUser()->getId(),
+            'user_name' => (string) $this->getUser()->getName(),
             'text' => (string) $this->getText(),
             'timestamp' => (string) $this->getTimestampDateTime()->format(\DateTime::ISO8601),
         ];

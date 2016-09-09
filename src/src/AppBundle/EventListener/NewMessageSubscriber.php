@@ -41,8 +41,12 @@ class NewMessageSubscriber implements EventSubscriber
         // only procced if we have a new message
         $document = $args->getDocument();
         if (!$document instanceof Message) return;
+
         // just return if the user is a  bot
         if ($document->getUser()->getIsBot()) return;
+
+        // also return if not a message, and the sub type is not null
+        if( 'message' !== $document->getType() || null !== $document->getSubType()) return;
 
         // ensure that the team log directory is present
         if (!is_dir($this->getSavePath($document))) {
