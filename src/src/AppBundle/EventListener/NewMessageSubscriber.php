@@ -3,6 +3,7 @@
 namespace AppBundle\EventListener;
 
 use AppBundle\Document\Message;
+use AppBundle\Document\User;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 
@@ -43,7 +44,7 @@ class NewMessageSubscriber implements EventSubscriber
         if (!$document instanceof Message) return;
 
         // just return if the user is a  bot
-        if ($document->getUser()->getIsBot()) return;
+        if ($document->getUser() instanceof User && $document->getUser()->getIsBot()) return;
 
         // also return if not a message, and the sub type is not null
         if( 'message' !== $document->getType() || null !== $document->getSubType()) return;

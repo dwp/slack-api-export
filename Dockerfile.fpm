@@ -15,9 +15,11 @@ COPY config/php.ini /usr/local/etc/php/
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
+# Setup volumes
 VOLUME /var/www/slack-api-export/var/cache
 VOLUME /var/www/slack-api-export/var/logs
-VOLUME /var/www/slack-api-export/var/export
+VOLUME /var/www/slack-api-export/var/messages
+VOLUME /var/www/slack-api-export/var/sessions
 
 COPY ./src /var/www/slack-api-export
 WORKDIR /var/www/slack-api-export
