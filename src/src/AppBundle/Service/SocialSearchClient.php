@@ -44,6 +44,10 @@ class SocialSearchClient
         $this->guzzleClient = $guzzleClient;
         $this->serviceUri = $uri;
         $this->logger = $logger;
+        // if env var set then use that
+        if (is_null($this->serviceUri)) {
+            $this->serviceUri = getenv("SOCIAL_SEARCH_API");
+        }
     }
 
     /**
@@ -53,6 +57,7 @@ class SocialSearchClient
      */
     public function createMessage(Message $message)
     {
+        $this->logger->info("Creating new message in the social search API.");
         if ($this->invalidService()) return; // do nothing
 
         try {
@@ -76,7 +81,10 @@ class SocialSearchClient
      */
     private function invalidService()
     {
-        if (is_null($this->serviceUri)) return true;
+        if (is_null($this->serviceUri)) {
+            $this->logger->info("Invalid service URI configuration in the social search client - unable to proceed.");
+            return true;
+        }
         return false;
     }
 }
