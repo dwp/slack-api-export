@@ -10,10 +10,10 @@ services:
       context: .
       dockerfile: Dockerfile.http
     environment:
-      - TUNNEL_HOSTNAME
       - SLACK_CLIENT_ID
       - SLACK_CLIENT_SECRET
       - SLACK_CLIENT_REDIRECT_URI
+      - SLACK_TOKEN
     depends_on:
       - base
     links:
@@ -21,7 +21,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./logs/http:/opt/slack-api-export/var/logs
+      - ./docker/slack_app:/opt/slack-api-export/var
 
   console:
     build:
@@ -32,8 +32,7 @@ services:
     links:
       - mongo
     volumes:
-      - ./logs/console:/opt/slack-api-export/var/logs
-      - ./export:/opt/slack-api-export/var/export
+      - ./docker/slack_console:/opt/slack-api-export/var
 
   mongo:
     image: mongo
