@@ -1,7 +1,7 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/book/service_container.html
 parameters:
-#    parameter_name: value
+    social_search_api: ~
 
 services:
     app.guzzle:
@@ -15,6 +15,13 @@ services:
         arguments:
           - "@app.guzzle"
           - "https://api.slack.com/api"
+
+    app.service.social_search_client:
+        class: AppBundle\Service\SocialSearchClient
+        arguments:
+          - "@app.guzzle"
+          - "%social_search_api%"
+          - "@logger"
 
     app.service.event:
         class: AppBundle\Service\EventService

@@ -44,17 +44,24 @@ class NewMessageSubscriber implements EventSubscriber
         // just return if the user is a  bot
         if ($document->getUser()->getIsBot()) return;
 
+        // now push to our storage systems
+        $this->logToDisk($document);
+
+    }
+
+    private function logToDisk(Message $message)
+    {
         // ensure that the team log directory is present
-        if (!is_dir($this->getSavePath($document))) {
-            mkdir($this->getSavePath($document), 0777, true);
+        if (!is_dir($this->getSavePath($message))) {
+            mkdir($this->getSavePath($message), 0777, true);
         }
 
         // need to emit the event - writing to filesystem at the moment - one log per day with one entry per line
         $handle = fopen(
-            $this->getSavePath($document) . "/" . $document->getTimestampDateTime()->format('Y-m-d') . ".log",
+            $this->getSavePath($message) . "/" . $message->getTimestampDateTime()->format('Y-m-d') . ".log",
             "a"
         );
-        fwrite($handle, json_encode($document->eventArray()) . PHP_EOL );
+        fwrite($handle, json_encode($message->eventArray()) . PHP_EOL );
         fclose($handle);
     }
 
