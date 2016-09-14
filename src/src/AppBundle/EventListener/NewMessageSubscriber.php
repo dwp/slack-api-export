@@ -4,6 +4,7 @@ namespace AppBundle\EventListener;
 
 use AppBundle\Document\Message;
 use AppBundle\Document\User;
+use AppBundle\Service\SocialSearchClient;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 
@@ -15,16 +16,27 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 class NewMessageSubscriber implements EventSubscriber
 {
     /**
+     * @var SocialSearchClient
+     */
+    protected $searchClient;
+
+    /**
      * @var string
      */
     protected $savePath;
 
     /**
      * NewMessageSubscriber constructor to inject our configuration information.
+     *
+     * @param SocialSearchClient $searchClient
      * @param string $savePath
      */
-    public function __construct($savePath)
+    public function __construct(
+        SocialSearchClient $searchClient,
+        $savePath
+    )
     {
+        $this->searchClient = $searchClient;
         // ensure directory is present
         $this->savePath = $savePath;
         if (!is_dir($this->savePath)) {
@@ -51,9 +63,25 @@ class NewMessageSubscriber implements EventSubscriber
 
         // now push to our storage systems
         $this->logToDisk($document);
+        $this->logToSearch($document);
 
     }
 
+    /**
+     * Log a message to the social search api.
+     *
+     * @param Message $message
+     */
+    private function logToSearch(Message $message)
+    {
+        $this->searchClient->createMessage($message);
+    }
+
+    /**
+     * Log a message to disk.
+     *
+     * @param Message $message
+     */
     private function logToDisk(Message $message)
     {
         // ensure that the team log directory is present

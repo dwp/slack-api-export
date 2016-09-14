@@ -51,7 +51,7 @@ class SocialSearchClient
      *
      * @param Message $message
      */
-    public function publishMessage(Message $message)
+    public function createMessage(Message $message)
     {
         if ($this->invalidService()) return; // do nothing
 
