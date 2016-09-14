@@ -78,6 +78,6 @@ services:
 
     app.subscriber.new_message:
         class: AppBundle\EventListener\NewMessageSubscriber
-        arguments: [ "%kernel.root_dir%/../var/messages" ]
+        arguments: [ "@app.service.social_search_client", "%kernel.root_dir%/../var/messages" ]
         tags:
           - { name: doctrine_mongodb.odm.event_subscriber, connection: default }
