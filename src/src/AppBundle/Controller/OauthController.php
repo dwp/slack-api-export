@@ -33,6 +33,9 @@ class OauthController extends Controller
             // do it early to force the configuration of state etc
             $authUrl = $provider->getAuthorizationUrl([
                 'scope' => [
+                    'bot',
+                    'identify',
+                    'chat:write:bot',
                     'channels:history',
                     'channels:read',
                     'team:read',
