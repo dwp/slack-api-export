@@ -3,7 +3,7 @@ services:
 
   base:
     build: .
-    image: slackapiexport_base
+    image: socialsearch_slack_base
 
   http:
     build:

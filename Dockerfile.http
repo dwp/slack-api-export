@@ -1,4 +1,4 @@
-FROM slackapiexport_base
+FROM socialsearch_slack_base
 
 # Expose and run the build in php web server
 EXPOSE 8000

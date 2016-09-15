@@ -1,4 +1,4 @@
-FROM slackapiexport_base
+FROM socialsearch_slack_base
 
 # swap our entry point
 ADD config/entrypoint.console.sh /usr/local/bin/entrypoint.sh
