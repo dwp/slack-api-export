@@ -32,9 +32,11 @@ class WebhookController extends Controller
             throw new BadRequestHttpException('Invalid token.');
         }
 
-        // ensure we have a valid team
-        $team = $this->getTeamService()->get($data['team_id']);
-        $this->getSlackClient()->setToken($team);
+        // ensure valid team is injected if present
+        if (array_key_exists('team_id', $data)) {
+            $team = $this->getTeamService()->get($data['team_id']);
+            $this->getSlackClient()->setToken($team);
+        }
 
         // and proces the event
         $event = EventFactory::factory($data);

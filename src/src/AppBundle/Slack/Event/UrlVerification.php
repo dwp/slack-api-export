@@ -20,8 +20,8 @@ class UrlVerification extends AbstractEvent implements EventInterface
 
     public function __construct($data)
     {
-        $this->challenge = $data->challenge;
-        $this->token = $data->token;
+        $this->challenge = $data['challenge'];
+        $this->token = $data['token'];
         parent::__construct($data);
     }
 

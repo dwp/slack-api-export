@@ -71,7 +71,10 @@ class SocialSearchClient
                 ]
             );
         } catch (RequestException $e) {
-            $this->logger->error("Unable to POST data to social search API: " . $e->getMessage());
+            $this->logger->error(
+                "Unable to POST data to social search API: " . $e->getMessage(),
+                [ 'service_uri' => $this->serviceUri ]
+            );
         }
     }
 
