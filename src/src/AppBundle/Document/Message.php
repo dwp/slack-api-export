@@ -384,6 +384,7 @@ class Message implements \JsonSerializable
             'id' => (string) $this->getId(),
             'user_id' => (string) $this->getUser()->getId(),
             'user_name' => (string) $this->getUser()->getName(),
+            'team' => (string) $this->getUser()->getTeam()->getId(),
             'text' => (string) $this->getText(),
             'timestamp' => (string) $this->getTimestampDateTime()->format(\DateTime::ISO8601),
         ];
